@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync my photos
+
+[Service]
+User=sync_my_photos
+Group=sync_my_photos
+Type=oneshot
+ExecStart=/usr/bin/python3 -m sync_my_photos
+Nice=19
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

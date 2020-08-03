@@ -1,0 +1,9 @@
+## arg 1:  the new package version
+post_install() {
+    python -m sync_my_photos.service start
+}
+
+## arg 1:  the old package version
+pre_remove() {
+    python -m sync_my_photos.service stop
+}
