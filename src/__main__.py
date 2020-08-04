@@ -1,7 +1,7 @@
-import time
-import os
 import argparse
 import logging
+from . import android_ssh
+
 
 def run():
     parser = argparse.ArgumentParser(description="sync_my_photos")
@@ -17,5 +17,8 @@ def run():
         log.setLevel(logging.DEBUG)
 
     print("Syncing...")
+    src = android_ssh.Android_ssh()
+    photos = src.get_photo_list()
 
+    
 run()
