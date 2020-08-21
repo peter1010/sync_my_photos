@@ -2,7 +2,13 @@ import configparser
 import os
 import sys
 
-from .. import exif
+try:
+    from sync_my_photos import exif
+except ImportError:
+    curdir = os.path.dirname(os.path.realpath(__file__))
+    sys.path.append(os.path.join(curdir, ".."))
+    import exif
+
 
 MonthStrs = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 
@@ -49,14 +55,22 @@ def Ask_rename(old_name, new_name):
         return True
     return False
 
+count = 0
 
 def process_file(root, year, month, _file):
+    global count
     idx = _file.rfind(".")
-    if idx > 0:
-        extension = _file[idx+1:]
+    if idx >= 0:
+        extension = _file[idx:]
         if extension.lower() in (".jpg", ".jpeg"):
+            count += 1
+            sys.stdout.write("\r%i  " % count)
             pathname = os.path.join(root, _file)
             info = exif.Exif(pathname)
+            if info.Year != year:
+                print("%s year %d != year %d" % (_file, info.Year, year))
+            if info.Month != month:
+                print("%s month %d != month %d" % (_file, info.Month, month))
     pass
 
 
@@ -90,12 +104,12 @@ def check_month_folder_name(root, year, folder):
             else:
                 Warn_user("Incorrect Folder name '%s', should be either %04i_xx_xxx format or %04i_Misc" \
                         % (folder, year, year))
-        return None, -1
+        return None, 0
     
     month = int(rest[:idx])
     if (month < 1) or (month > 12):
         Warn_user("Month out of range %s, should be between 1 and 12" % rest[:idx])
-        return None, -1
+        return None, 0
 
     if idx != 2:
         fix = Ask_user("Incorrect folder name '%s' month should be 2 digits, fix?" \
